@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Chef-sugar by sethvargo</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Chef-sugar</h1>
+        <h2>Chef Sugar is a Gem &amp; Chef Recipe that includes series of helpful sugar of the Chef core and other resources to make a cleaner, more lean recipd DSL, enforce DRY principles, and make writing Chef recipes an awesome experience!</h2>
+        <a href="https://github.com/sethvargo/chef-sugar" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a name="chefsugar" class="anchor" href="#chefsugar"><span class="octicon octicon-link"></span></a>Chef::Sugar</h1>
+
+<p><a href="http://travis-ci.org/sethvargo/chef-sugar"><img src="https://secure.travis-ci.org/sethvargo/chef-sugar.png?branch=master" alt="Build Status"></a>
+<a href="http://badge.fury.io/rb/chef-sugar"><img src="https://badge.fury.io/rb/chef-sugar.png" alt="Gem Version"></a>
+<a href="https://gemnasium.com/sethvargo/chef-sugar"><img src="https://gemnasium.com/sethvargo/chef-sugar.png" alt="Dependency Status"></a>
+<a href="https://codeclimate.com/github/sethvargo/chef-sugar"><img src="https://codeclimate.com/github/sethvargo/chef-sugar.png" alt="Code Climate"></a></p>
+
+<p>Chef Sugar is a Gem &amp; Chef Recipe that includes series of helpful sugar of the Chef core and other resources to make a cleaner, more lean recipd DSL, enforce DRY principles, and make writing Chef recipes an awesome experience!</p>
+
+<h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p>If you want to development/hack on chef-sugar, please see the Contributing.md.</p>
+
+<p>If you are using Berkshelf, add <code>chef-sugar</code> to your <code>Berksfile</code>:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="n">cookbook</span> <span class="s1">'chef-sugar'</span>
+</pre></div>
+
+<p>Otherwise, you can use <code>knife</code> or download the tarball directly from the community site:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="n">knife</span> <span class="n">cookbook</span> <span class="n">site</span> <span class="n">install</span> <span class="n">chef</span><span class="o">-</span><span class="n">sugar</span>
+</pre></div>
+
+<h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>In order to use Chef Sugar in your Chef Recipes, you'll first need to include it:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="n">include_recipe</span> <span class="s1">'chef-sugar::default'</span>
+</pre></div>
+
+<p>Alternatively you can put it in a base role or recipe and it will be included subsequently.</p>
+
+<p>Requiring the Chef Sugar Gem will automatically extend the Recipe DSL, <code>Chef::Resource</code>, and <code>Chef::Provider</code> with helpful convienence methods.</p>
+
+<h3>
+<a name="module-method" class="anchor" href="#module-method"><span class="octicon octicon-link"></span></a>Module Method</h3>
+
+<p>If you are working outside of the Recipe DSL, you can use the module methods instead of the Recipe DSL. In general, the module methods have the same name as their Recipe-DSL counterparts, but require the node object as a parameter. For example:</p>
+
+<p>In a Recipe:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="c1"># cookbook/recipes/default.rb</span>
+<span class="n">do_something</span> <span class="k">if</span> <span class="n">windows?</span>
+</pre></div>
+
+<p>In a Library as a singleton:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="c1"># cookbook/libraries/default.rb</span>
+<span class="k">def</span> <span class="nf">only_on_windows</span><span class="p">(</span><span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+  <span class="k">yield</span> <span class="k">if</span> <span class="ss">Chef</span><span class="p">:</span><span class="ss">:Sugar</span><span class="o">::</span><span class="no">PlatformFamily</span><span class="o">.</span><span class="n">windows?</span><span class="p">(</span><span class="vi">@node</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+
+<p>In a Library as a Mixin:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="c1"># cookbook/libraries/default.rb</span>
+<span class="kp">include</span> <span class="ss">Chef</span><span class="p">:</span><span class="ss">:Sugar</span><span class="o">::</span><span class="no">PlatformFamily</span>
+
+<span class="k">def</span> <span class="nf">only_on_windows</span><span class="p">(</span><span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+  <span class="k">yield</span> <span class="k">if</span> <span class="n">windows?</span><span class="p">(</span><span class="vi">@node</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+
+<h2>
+<a name="api" class="anchor" href="#api"><span class="octicon octicon-link"></span></a>API</h2>
+
+<p><strong>Note:</strong> For the most extensive API documentation, please see the YARD documentation.</p>
+
+<h3>
+<a name="architecture" class="anchor" href="#architecture"><span class="octicon octicon-link"></span></a>Architecture</h3>
+
+<p><strong>Note:</strong> Some of the architecture commands begin with an underscore (<code>_</code>) because Ruby does not permit methods to start with a numeric.</p>
+
+<ul>
+<li><code>_64_bit?</code></li>
+<li><code>_32_bit?</code></li>
+</ul><h4>
+<a name="examples" class="anchor" href="#examples"><span class="octicon octicon-link"></span></a>Examples</h4>
+
+<div class="highlight highlight-ruby"><pre><span class="n">execute</span> <span class="s1">'build[my binary]'</span> <span class="k">do</span>
+  <span class="n">command</span> <span class="s1">'...'</span>
+  <span class="n">not_if</span>  <span class="p">{</span> <span class="n">_64_bit?</span> <span class="p">}</span>
+<span class="k">end</span>
+</pre></div>
+
+<h3>
+<a name="cloud" class="anchor" href="#cloud"><span class="octicon octicon-link"></span></a>Cloud</h3>
+
+<ul>
+<li><code>azure?</code></li>
+<li><code>cloud?</code></li>
+<li><code>ec2?</code></li>
+<li><code>eucalyptus?</code></li>
+<li><code>gce?</code></li>
+<li><code>linode?</code></li>
+<li><code>openstack?</code></li>
+<li><code>rackspace?</code></li>
+</ul><h4>
+<a name="examples-1" class="anchor" href="#examples-1"><span class="octicon octicon-link"></span></a>Examples</h4>
+
+<div class="highlight highlight-ruby"><pre><span class="n">template</span> <span class="s1">'/tmp/config'</span> <span class="k">do</span>
+  <span class="n">variables</span><span class="p">(</span>
+    <span class="c1"># See also: best_ip_for</span>
+    <span class="ss">ipaddress</span><span class="p">:</span> <span class="n">cloud?</span> <span class="p">?</span> <span class="n">node</span><span class="o">[</span><span class="s1">'local_ipv4'</span><span class="o">]</span> <span class="p">:</span> <span class="n">node</span><span class="o">[</span><span class="s1">'public_ipv4'</span><span class="o">]</span>
+  <span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+
+<h3>
+<a name="ip" class="anchor" href="#ip"><span class="octicon octicon-link"></span></a>IP</h3>
+
+<ul>
+<li>
+<code>best_ip_for</code> - determine the best IP address for the given "other" node, preferring local IP addresses over public ones.</li>
+</ul><h4>
+<a name="examples-2" class="anchor" href="#examples-2"><span class="octicon octicon-link"></span></a>Examples</h4>
+
+<div class="highlight highlight-ruby"><pre><span class="n">redis</span> <span class="o">=</span> <span class="n">search</span><span class="p">(</span><span class="s1">'node'</span><span class="p">,</span> <span class="s1">'role:redis'</span><span class="p">)</span><span class="o">.</span><span class="n">first</span>
+
+<span class="n">template</span> <span class="s1">'/tmp/config'</span> <span class="k">do</span>
+  <span class="n">variables</span><span class="p">(</span>
+    <span class="ss">ipaddress</span><span class="p">:</span> <span class="n">best_ip_for</span><span class="p">(</span><span class="n">redis</span><span class="p">)</span>
+  <span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+
+<h3>
+<a name="node" class="anchor" href="#node"><span class="octicon octicon-link"></span></a>Node</h3>
+
+<ul>
+<li>
+<code>in?</code> - determine if the node is in the given Chef environment.</li>
+<li><code>includes_recipe?</code></li>
+</ul><h4>
+<a name="examples-3" class="anchor" href="#examples-3"><span class="octicon octicon-link"></span></a>Examples</h4>
+
+<div class="highlight highlight-ruby"><pre><span class="n">credentials</span> <span class="o">=</span> <span class="k">if</span> <span class="k">in</span><span class="sc">?(</span><span class="s1">'production'</span><span class="p">)</span>
+                <span class="ss">Chef</span><span class="p">:</span><span class="ss">:EncryptedDataBag</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">'...'</span><span class="p">)</span>
+              <span class="k">else</span>
+                <span class="n">data_bag</span><span class="p">(</span><span class="s1">'...'</span><span class="p">)</span>
+              <span class="k">end</span>
+</pre></div>
+
+<div class="highlight highlight-ruby"><pre><span class="k">if</span> <span class="n">includes_recipe?</span><span class="p">(</span><span class="s1">'apache2::default'</span><span class="p">)</span>
+  <span class="n">apache_module</span> <span class="s1">'my_module'</span> <span class="k">do</span>
+    <span class="c1"># ...</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+
+<h3>
+<a name="platform" class="anchor" href="#platform"><span class="octicon octicon-link"></span></a>Platform</h3>
+
+<ul>
+<li><code>amazon_linux?</code></li>
+<li><code>centos?</code></li>
+<li><code>linux_mint?</code></li>
+<li><code>oracle_linux?</code></li>
+<li><code>redhat_enterprise_linux?</code></li>
+<li><code>scientific_linux?</code></li>
+<li><code>ubuntu?</code></li>
+</ul><p>There are also a series of dynamically defined matchers that map named operating system release versions and comparison operators in the form "#{platform}_#{operator}_#{name}?". For example:</p>
+
+<ul>
+<li><code>debian_after_squeeze?</code></li>
+<li><code>linuxmint_after_or_at_olivia?</code></li>
+<li><code>mac_os_x_lion?</code></li>
+<li><code>ubuntu_before_lucid?</code></li>
+<li><code>ubuntu_before_or_at_maverick?</code></li>
+</ul><p>To get a full list, run the following in IRB:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="nb">require</span> <span class="s1">'chef/sugar'</span>
+<span class="nb">puts</span> <span class="ss">Chef</span><span class="p">:</span><span class="ss">:Sugar</span><span class="o">::</span><span class="no">Platform</span><span class="o">.</span><span class="n">instance_methods</span>
+</pre></div>
+
+<h4>
+<a name="examples-4" class="anchor" href="#examples-4"><span class="octicon octicon-link"></span></a>Examples</h4>
+
+<div class="highlight highlight-ruby"><pre><span class="k">if</span> <span class="n">ubuntu?</span>
+  <span class="n">execute</span> <span class="s1">'apt-get update'</span>
+<span class="k">end</span>
+</pre></div>
+
+<h3>
+<a name="platform-family" class="anchor" href="#platform-family"><span class="octicon octicon-link"></span></a>Platform Family</h3>
+
+<ul>
+<li><code>arch_linux?</code></li>
+<li><code>debian?</code></li>
+<li><code>fedora?</code></li>
+<li><code>freebsd?</code></li>
+<li><code>gentoo?</code></li>
+<li><code>linux?</code></li>
+<li><code>mac_os_x?</code></li>
+<li><code>openbsd?</code></li>
+<li><code>rhel?</code></li>
+<li><code>slackware?</code></li>
+<li><code>suse?</code></li>
+<li><code>windows?</code></li>
+</ul><h4>
+<a name="examples-5" class="anchor" href="#examples-5"><span class="octicon octicon-link"></span></a>Examples</h4>
+
+<div class="highlight highlight-ruby"><pre><span class="n">node</span><span class="o">[</span><span class="s1">'attribute'</span><span class="o">]</span> <span class="o">=</span> <span class="k">if</span> <span class="n">windows?</span>
+                      <span class="s1">'C:\Foo\BarDrive'</span>
+                    <span class="k">else</span>
+                      <span class="s1">'/foo/bar_drive'</span>
+                    <span class="k">end</span>
+</pre></div>
+
+<h3>
+<a name="ruby" class="anchor" href="#ruby"><span class="octicon octicon-link"></span></a>Ruby</h3>
+
+<p><strong>Note:</strong> The applies to the the Ruby found at <code>node['languages']['ruby']</code>.</p>
+
+<ul>
+<li><code>ruby_20?</code></li>
+<li><code>ruby_19?</code></li>
+</ul><h4>
+<a name="examples-6" class="anchor" href="#examples-6"><span class="octicon octicon-link"></span></a>Examples</h4>
+
+<div class="highlight highlight-ruby"><pre><span class="n">log</span> <span class="s1">'This has been known to fail on Ruby 2.0'</span> <span class="k">if</span> <span class="n">ruby_20?</span>
+</pre></div>
+
+<h3>
+<a name="shell" class="anchor" href="#shell"><span class="octicon octicon-link"></span></a>Shell</h3>
+
+<ul>
+<li><code>which</code></li>
+<li><code>dev_null</code></li>
+<li><code>installed?</code></li>
+<li><code>installed_at_version?</code></li>
+<li><code>version_for</code></li>
+</ul><h4>
+<a name="examples-7" class="anchor" href="#examples-7"><span class="octicon octicon-link"></span></a>Examples</h4>
+
+<div class="highlight highlight-ruby"><pre><span class="n">log</span> <span class="s2">"Using `mongo` at `</span><span class="si">#{</span><span class="n">which</span><span class="p">(</span><span class="s1">'mongo'</span><span class="p">)</span><span class="si">}</span><span class="s2">`"</span>
+
+<span class="k">if</span> <span class="n">installed?</span><span class="p">(</span><span class="s1">'apt'</span><span class="p">)</span>
+  <span class="n">execute</span> <span class="s1">'apt-get update'</span>
+<span class="k">end</span>
+
+<span class="n">execute</span> <span class="s1">'install[thing]'</span> <span class="k">do</span>
+  <span class="n">command</span> <span class="s2">"... 2&gt;&amp;1 </span><span class="si">#{</span><span class="n">dev_null</span><span class="si">}</span><span class="s2">"</span>
+  <span class="n">not_if</span>  <span class="p">{</span> <span class="n">installed_at_version?</span><span class="p">(</span><span class="s1">'thing'</span><span class="p">,</span> <span class="n">node</span><span class="o">[</span><span class="s1">'thing'</span><span class="o">][</span><span class="s1">'version'</span><span class="o">]</span><span class="p">)</span> <span class="p">}</span>
+<span class="k">end</span>
+
+<span class="n">log</span> <span class="s2">"Skipping git install, version is at </span><span class="si">#{</span><span class="n">version_for</span><span class="p">(</span><span class="s1">'mongo'</span><span class="p">,</span> <span class="s1">'-v'</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+</pre></div>
+
+<h3>
+<a name="vagrant" class="anchor" href="#vagrant"><span class="octicon octicon-link"></span></a>Vagrant</h3>
+
+<ul>
+<li><code>vagrant?</code></li>
+</ul><h4>
+<a name="examples-8" class="anchor" href="#examples-8"><span class="octicon octicon-link"></span></a>Examples</h4>
+
+<div class="highlight highlight-ruby"><pre><span class="n">http_request</span> <span class="s1">'http://...'</span> <span class="k">do</span>
+  <span class="n">not_if</span> <span class="p">{</span> <span class="n">vagrant?</span> <span class="p">}</span>
+<span class="k">end</span>
+</pre></div>
+
+<h3>
+<a name="filters" class="anchor" href="#filters"><span class="octicon octicon-link"></span></a>Filters</h3>
+
+<ul>
+<li>
+<code>compile_time</code> - accepts a block of resources to run at compile time</li>
+<li>
+<code>before</code> - insert resource in the collection before the given resource</li>
+<li>
+<code>after</code> - insert resource in the collection after the given resource</li>
+</ul><h4>
+<a name="examples-9" class="anchor" href="#examples-9"><span class="octicon octicon-link"></span></a>Examples</h4>
+
+<div class="highlight highlight-ruby"><pre><span class="n">compile_time</span> <span class="k">do</span>
+  <span class="n">package</span> <span class="s1">'apache2'</span>
+<span class="k">end</span>
+
+<span class="c1"># This is equivalent to</span>
+<span class="n">package</span> <span class="s1">'apache2'</span> <span class="k">do</span>
+  <span class="s1">'apache2'</span>
+<span class="k">end</span><span class="o">.</span><span class="n">run_action</span><span class="p">(</span><span class="ss">:install</span><span class="p">)</span>
+</pre></div>
+
+<div class="highlight highlight-ruby"><pre><span class="n">before</span> <span class="s1">'service[apache2]'</span> <span class="k">do</span>
+  <span class="n">log</span> <span class="s1">'I am before the apache 2 service fires!'</span>
+<span class="k">end</span>
+</pre></div>
+
+<div class="highlight highlight-ruby"><pre><span class="n">after</span> <span class="s1">'service[apache2]'</span> <span class="k">do</span>
+  <span class="n">log</span> <span class="s1">'I am after the apache 2 service fires!'</span>
+<span class="k">end</span>
+</pre></div>
+
+<h2>
+<a name="license--authors" class="anchor" href="#license--authors"><span class="octicon octicon-link"></span></a>License &amp; Authors</h2>
+
+<ul>
+<li>Author: Seth Vargo (<a href="mailto:sethvargo@gmail.com">sethvargo@gmail.com</a>)</li>
+</ul><div class="highlight highlight-text"><pre>Copyright 2013 Seth Vargo
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+</pre></div>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/sethvargo/chef-sugar/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/sethvargo/chef-sugar/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/sethvargo/chef-sugar"></a> is maintained by <a href="https://github.com/sethvargo">sethvargo</a>.</p>
+
+          <p>This page was generated by <a href="pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
