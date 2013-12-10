@@ -80,14 +80,14 @@
 
 <div class="highlight highlight-ruby"><pre><span class="c1"># cookbook/libraries/default.rb</span>
 <span class="k">def</span> <span class="nf">only_on_windows</span><span class="p">(</span><span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
-  <span class="k">yield</span> <span class="k">if</span> <span class="ss">Chef</span><span class="p">:</span><span class="ss">:Sugar</span><span class="o">::</span><span class="no">PlatformFamily</span><span class="o">.</span><span class="n">windows?</span><span class="p">(</span><span class="vi">@node</span><span class="p">)</span>
+  <span class="k">yield</span> <span class="k">if</span> <span class="no">Chef</span><span class="o">::</span><span class="no">Sugar</span><span class="o">::</span><span class="no">PlatformFamily</span><span class="o">.</span><span class="n">windows?</span><span class="p">(</span><span class="vi">@node</span><span class="p">)</span>
 <span class="k">end</span>
 </pre></div>
 
 <p>In a Library as a Mixin:</p>
 
 <div class="highlight highlight-ruby"><pre><span class="c1"># cookbook/libraries/default.rb</span>
-<span class="kp">include</span> <span class="ss">Chef</span><span class="p">:</span><span class="ss">:Sugar</span><span class="o">::</span><span class="no">PlatformFamily</span>
+<span class="kp">include</span> <span class="no">Chef</span><span class="o">::</span><span class="no">Sugar</span><span class="o">::</span><span class="no">PlatformFamily</span>
 
 <span class="k">def</span> <span class="nf">only_on_windows</span><span class="p">(</span><span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
   <span class="k">yield</span> <span class="k">if</span> <span class="n">windows?</span><span class="p">(</span><span class="vi">@node</span><span class="p">)</span>
@@ -127,6 +127,7 @@
 <li><code>gce?</code></li>
 <li><code>linode?</code></li>
 <li><code>openstack?</code></li>
+<li><code>cloudstack?</code></li>
 <li><code>rackspace?</code></li>
 </ul><h4>
 <a name="examples-1" class="anchor" href="#examples-1"><span class="octicon octicon-link"></span></a>Examples</h4>
@@ -140,13 +141,30 @@
 </pre></div>
 
 <h3>
+<a name="data-bag" class="anchor" href="#data-bag"><span class="octicon octicon-link"></span></a>Data Bag</h3>
+
+<ul>
+<li>
+<code>encrypted_data_bag_item</code> - a handy DSL method for loading encrypted data bag items the same way you load a regular data bag item; this requires <code>Chef::Config[:encrypted_data_bag_secret]</code> is set!</li>
+<li>
+<code>encrypted_data_bag_item_for_environment</code> - find the data bag entry for the current node's Chef environment.</li>
+</ul><h4>
+<a name="examples-2" class="anchor" href="#examples-2"><span class="octicon octicon-link"></span></a>Examples</h4>
+
+<div class="highlight highlight-ruby"><pre><span class="n">encrypted_data_bag_item</span><span class="p">(</span><span class="s1">'accounts'</span><span class="p">,</span> <span class="s1">'hipchat'</span><span class="p">)</span>
+</pre></div>
+
+<div class="highlight highlight-ruby"><pre><span class="n">encrypted_data_bag_item_for_environment</span><span class="p">(</span><span class="s1">'accounts'</span><span class="p">,</span> <span class="s1">'github'</span><span class="p">)</span>
+</pre></div>
+
+<h3>
 <a name="ip" class="anchor" href="#ip"><span class="octicon octicon-link"></span></a>IP</h3>
 
 <ul>
 <li>
 <code>best_ip_for</code> - determine the best IP address for the given "other" node, preferring local IP addresses over public ones.</li>
 </ul><h4>
-<a name="examples-2" class="anchor" href="#examples-2"><span class="octicon octicon-link"></span></a>Examples</h4>
+<a name="examples-3" class="anchor" href="#examples-3"><span class="octicon octicon-link"></span></a>Examples</h4>
 
 <div class="highlight highlight-ruby"><pre><span class="n">redis</span> <span class="o">=</span> <span class="n">search</span><span class="p">(</span><span class="s1">'node'</span><span class="p">,</span> <span class="s1">'role:redis'</span><span class="p">)</span><span class="o">.</span><span class="n">first</span>
 
@@ -165,10 +183,10 @@
 <code>in?</code> - determine if the node is in the given Chef environment.</li>
 <li><code>includes_recipe?</code></li>
 </ul><h4>
-<a name="examples-3" class="anchor" href="#examples-3"><span class="octicon octicon-link"></span></a>Examples</h4>
+<a name="examples-4" class="anchor" href="#examples-4"><span class="octicon octicon-link"></span></a>Examples</h4>
 
 <div class="highlight highlight-ruby"><pre><span class="n">credentials</span> <span class="o">=</span> <span class="k">if</span> <span class="k">in</span><span class="sc">?(</span><span class="s1">'production'</span><span class="p">)</span>
-                <span class="ss">Chef</span><span class="p">:</span><span class="ss">:EncryptedDataBag</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">'...'</span><span class="p">)</span>
+                <span class="no">Chef</span><span class="o">::</span><span class="no">EncryptedDataBag</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">'...'</span><span class="p">)</span>
               <span class="k">else</span>
                 <span class="n">data_bag</span><span class="p">(</span><span class="s1">'...'</span><span class="p">)</span>
               <span class="k">end</span>
@@ -203,11 +221,11 @@
 </ul><p>To get a full list, run the following in IRB:</p>
 
 <div class="highlight highlight-ruby"><pre><span class="nb">require</span> <span class="s1">'chef/sugar'</span>
-<span class="nb">puts</span> <span class="ss">Chef</span><span class="p">:</span><span class="ss">:Sugar</span><span class="o">::</span><span class="no">Platform</span><span class="o">.</span><span class="n">instance_methods</span>
+<span class="nb">puts</span> <span class="no">Chef</span><span class="o">::</span><span class="no">Sugar</span><span class="o">::</span><span class="no">Platform</span><span class="o">.</span><span class="n">instance_methods</span>
 </pre></div>
 
 <h4>
-<a name="examples-4" class="anchor" href="#examples-4"><span class="octicon octicon-link"></span></a>Examples</h4>
+<a name="examples-5" class="anchor" href="#examples-5"><span class="octicon octicon-link"></span></a>Examples</h4>
 
 <div class="highlight highlight-ruby"><pre><span class="k">if</span> <span class="n">ubuntu?</span>
   <span class="n">execute</span> <span class="s1">'apt-get update'</span>
@@ -231,7 +249,7 @@
 <li><code>suse?</code></li>
 <li><code>windows?</code></li>
 </ul><h4>
-<a name="examples-5" class="anchor" href="#examples-5"><span class="octicon octicon-link"></span></a>Examples</h4>
+<a name="examples-6" class="anchor" href="#examples-6"><span class="octicon octicon-link"></span></a>Examples</h4>
 
 <div class="highlight highlight-ruby"><pre><span class="n">node</span><span class="o">[</span><span class="s1">'attribute'</span><span class="o">]</span> <span class="o">=</span> <span class="k">if</span> <span class="n">windows?</span>
                       <span class="s1">'C:\Foo\BarDrive'</span>
@@ -249,7 +267,7 @@
 <li><code>ruby_20?</code></li>
 <li><code>ruby_19?</code></li>
 </ul><h4>
-<a name="examples-6" class="anchor" href="#examples-6"><span class="octicon octicon-link"></span></a>Examples</h4>
+<a name="examples-7" class="anchor" href="#examples-7"><span class="octicon octicon-link"></span></a>Examples</h4>
 
 <div class="highlight highlight-ruby"><pre><span class="n">log</span> <span class="s1">'This has been known to fail on Ruby 2.0'</span> <span class="k">if</span> <span class="n">ruby_20?</span>
 </pre></div>
@@ -264,7 +282,7 @@
 <li><code>installed_at_version?</code></li>
 <li><code>version_for</code></li>
 </ul><h4>
-<a name="examples-7" class="anchor" href="#examples-7"><span class="octicon octicon-link"></span></a>Examples</h4>
+<a name="examples-8" class="anchor" href="#examples-8"><span class="octicon octicon-link"></span></a>Examples</h4>
 
 <div class="highlight highlight-ruby"><pre><span class="n">log</span> <span class="s2">"Using `mongo` at `</span><span class="si">#{</span><span class="n">which</span><span class="p">(</span><span class="s1">'mongo'</span><span class="p">)</span><span class="si">}</span><span class="s2">`"</span>
 
@@ -286,7 +304,7 @@
 <ul>
 <li><code>vagrant?</code></li>
 </ul><h4>
-<a name="examples-8" class="anchor" href="#examples-8"><span class="octicon octicon-link"></span></a>Examples</h4>
+<a name="examples-9" class="anchor" href="#examples-9"><span class="octicon octicon-link"></span></a>Examples</h4>
 
 <div class="highlight highlight-ruby"><pre><span class="n">http_request</span> <span class="s1">'http://...'</span> <span class="k">do</span>
   <span class="n">not_if</span> <span class="p">{</span> <span class="n">vagrant?</span> <span class="p">}</span>
@@ -304,7 +322,7 @@
 <li>
 <code>after</code> - insert resource in the collection after the given resource</li>
 </ul><h4>
-<a name="examples-9" class="anchor" href="#examples-9"><span class="octicon octicon-link"></span></a>Examples</h4>
+<a name="examples-10" class="anchor" href="#examples-10"><span class="octicon octicon-link"></span></a>Examples</h4>
 
 <div class="highlight highlight-ruby"><pre><span class="n">compile_time</span> <span class="k">do</span>
   <span class="n">package</span> <span class="s1">'apache2'</span>
@@ -312,7 +330,7 @@
 
 <span class="c1"># This is equivalent to</span>
 <span class="n">package</span> <span class="s1">'apache2'</span> <span class="k">do</span>
-  <span class="s1">'apache2'</span>
+  <span class="n">action</span> <span class="ss">:nothing</span>
 <span class="k">end</span><span class="o">.</span><span class="n">run_action</span><span class="p">(</span><span class="ss">:install</span><span class="p">)</span>
 </pre></div>
 
