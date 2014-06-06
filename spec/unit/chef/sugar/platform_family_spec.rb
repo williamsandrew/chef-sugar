@@ -138,12 +138,12 @@ describe Chef::Sugar::PlatformFamily do
   describe '#linux?' do
     it 'returns true when the platform_family is linux-based' do
       node = { 'platform_family' => 'debian' }
-      expect(described_class.debian?(node)).to be_truthy
+      expect(described_class.linux?(node)).to be_truthy
     end
 
     it 'returns false when the platform_family is not linux-based' do
       node = { 'platform_family' => 'windows' }
-      expect(described_class.debian?(node)).to be_falsey
+      expect(described_class.linux?(node)).to be_falsey
     end
   end
 end
