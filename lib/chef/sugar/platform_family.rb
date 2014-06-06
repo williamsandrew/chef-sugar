@@ -143,7 +143,21 @@ class Chef
       def windows?(node)
         node['platform_family'] == 'windows'
       end
-      alias_method :not_linux?, :windows?
+      alias_method :not_nix?, :windows?
+      alias_method :not_unix_like?, :windows?
+
+      #
+      # Determine if the current system is a unix-like os
+      #
+      # @param [Chef::Node] node
+      #
+      # @return [Boolean]
+      #
+      def nix?(node)
+        !windows?(node)
+      end
+      alias_method :not_windows?, :nix?
+      alias_method :unix_like?, :nix?
 
       #
       # Determine if the current system is a linux derivative
@@ -153,9 +167,9 @@ class Chef
       # @return [Boolean]
       #
       def linux?(node)
-        !windows?(node)
+        %{suse rhel fedora debian gentoo arch slackware}.
+          include?(node['platform_family'])
       end
-      alias_method :not_windows?, :linux?
     end
 
     module DSL
